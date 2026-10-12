@@ -17,7 +17,7 @@ ${password}            ${fields.ui.password}
 Open Website
     [Documentation]    This keyword open the website
     [Arguments]    ${browser}    ${url}
-    New Browser    browser=${browser}    headless=false
+    New Browser    browser=${browser}    headless=True
     New Page    ${url}
 
 Login With Valid Credencial
