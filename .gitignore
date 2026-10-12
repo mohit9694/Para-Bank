@@ -1,0 +1,23 @@
+# Robot Framework results
+*.html
+*.xml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+
+# VS Code
+.vscode/
+
+playwright-log.txt
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

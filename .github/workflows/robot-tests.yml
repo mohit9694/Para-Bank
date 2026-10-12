@@ -1,0 +1,42 @@
+name: Robot Framework Tests
+
+on:
+  push:
+    branches:
+      - master
+      - "ms/**"
+
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  robot-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t robot-automation .
+
+      - name: Run Robot Framework tests
+        run: |
+          mkdir -p results
+
+          docker run --rm \
+            -v "${{ github.workspace }}/TestCases:/automation/TestCases" \
+            -v "${{ github.workspace }}/Resources:/automation/Resources" \
+            -v "${{ github.workspace }}/Python:/automation/Python" \
+            -v "${{ github.workspace }}/results:/automation/results" \
+          para-bank\
+            robot --outputdir /automation/results TestCases
+
+      - name: Upload Robot Framework results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-test-results
+          path: results/

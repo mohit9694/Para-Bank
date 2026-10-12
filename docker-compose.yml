@@ -1,0 +1,19 @@
+services:
+  para-bank:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  
+
+    container_name: para-bank
+
+    user: "1000:1000"
+
+    volumes:
+      - .:/automation
+
+    stdin_open: true
+    tty: true
+  
