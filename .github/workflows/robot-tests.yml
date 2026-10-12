@@ -3,12 +3,12 @@ name: Robot Framework Tests
 on:
   push:
     branches:
-      - master
+      - main
       - "ms/**"
 
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   robot-tests:
