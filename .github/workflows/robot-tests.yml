@@ -31,7 +31,7 @@ jobs:
             -v "${{ github.workspace }}/Resources:/automation/Resources" \
             -v "${{ github.workspace }}/Python:/automation/Python" \
             -v "${{ github.workspace }}/results:/automation/results" \
-          para-bank\
+            robot-automation \
             robot --outputdir /automation/results TestCases
 
       - name: Upload Robot Framework results
