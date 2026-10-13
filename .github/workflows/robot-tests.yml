@@ -53,8 +53,8 @@ jobs:
         if: always()
         run: |
           if [ -f results/output.xml ]; then
-            python Python/generate_report.py results/output.xml \
+            python python/generate_report.py results/output.xml \
               --output results/custom_report.html
           else
             echo "Robot output.xml not found"
-          fi    
+          fi
