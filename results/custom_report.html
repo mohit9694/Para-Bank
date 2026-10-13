@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA Test Dashboard · TestCases</title>
+<style>
+:root {
+  --accent: #F48031;
+  --accent-rgb: 244, 128, 49;
+  --ink: #f8fafc;
+  --muted: #b9c4d5;
+  --glass: rgba(255, 255, 255, .085);
+  --glass-border: rgba(255, 255, 255, .19);
+  --shadow: 0 22px 60px rgba(0, 0, 0, .24);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(244,128,49,.28), transparent 33%),
+    radial-gradient(ellipse at 90% 18%, rgba(83,111,255,.25), transparent 34%),
+    linear-gradient(135deg, #111827 0%, #172033 48%, #0b1220 100%);
+  background-attachment: fixed;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 42px 24px 56px; }
+header { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin-bottom:30px; }
+.eyebrow { color:var(--accent); text-transform:uppercase; letter-spacing:.18em; font-size:.75rem; font-weight:800; }
+h1 { margin:10px 0 8px; font-size:clamp(2rem, 4vw, 3.15rem); letter-spacing:-.045em; }
+.subtitle { color:var(--muted); margin:0; line-height:1.6; }
+.run-meta { text-align:right; color:var(--muted); font-size:.88rem; line-height:1.8; }
+.run-meta strong { color:var(--ink); }
+.glass {
+  background:var(--glass); border:1px solid var(--glass-border);
+  box-shadow:var(--shadow); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border-radius:22px;
+}
+.summary { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; margin:26px 0 18px; }
+.card { padding:22px; position:relative; overflow:hidden; }
+.card:after { content:""; position:absolute; width:100px; height:100px; border-radius:50%; right:-35px; top:-42px; background:rgba(255,255,255,.06); }
+.card-label { color:var(--muted); font-size:.86rem; }
+.card-value { font-size:2.2rem; font-weight:800; letter-spacing:-.04em; margin:9px 0 5px; }
+.card-note { color:var(--muted); font-size:.8rem; }
+.accent { color:var(--accent); }
+.pass-text { color:var(--accent); }
+.fail-text { color:#ff8585; }
+.skip-text { color:#c5b8ff; }
+.progress-shell { height:9px; background:rgba(255,255,255,.1); border-radius:99px; overflow:hidden; margin-top:17px; }
+.progress { height:100%; width:92.21%; background:var(--accent); border-radius:99px; }
+.panel { padding:22px; margin-top:18px; }
+.panel-head { display:flex; justify-content:space-between; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:18px; }
+h2 { margin:0; font-size:1.15rem; }
+.controls { display:flex; gap:10px; flex-wrap:wrap; }
+input, select {
+  color:var(--ink); background:rgba(8,15,28,.5); border:1px solid var(--glass-border);
+  border-radius:11px; padding:11px 13px; outline:none; min-height:42px;
+}
+input { min-width:230px; }
+input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(var(--accent-rgb),.16); }
+.tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.tab { cursor:pointer; border:1px solid var(--glass-border); color:var(--muted); background:rgba(255,255,255,.04); padding:9px 13px; border-radius:999px; font-size:.82rem; }
+.tab.active { background:var(--accent); border-color:var(--accent); color:#1c120b; font-weight:800; }
+.table-wrap { overflow:auto; border:1px solid rgba(255,255,255,.1); border-radius:15px; }
+table { width:100%; border-collapse:collapse; min-width:740px; }
+th { color:var(--muted); font-size:.75rem; text-align:left; text-transform:uppercase; letter-spacing:.1em; background:rgba(255,255,255,.045); }
+th, td { padding:15px 16px; border-bottom:1px solid rgba(255,255,255,.08); vertical-align:top; }
+tbody tr:hover { background:rgba(255,255,255,.035); }
+tbody tr:last-child td { border-bottom:0; }
+.test-name { display:block; font-weight:700; }
+td small { display:block; color:var(--muted); margin-top:5px; }
+.pill { display:inline-block; padding:5px 9px; border-radius:999px; font-size:.72rem; font-weight:800; letter-spacing:.04em; }
+.pill.pass { color:#1b120b; background:var(--accent); }
+.pill.fail { color:#ffe4e4; background:rgba(239,68,68,.18); border:1px solid rgba(248,113,113,.35); }
+.pill.skip, .pill.skipped { color:#e6ddff; background:rgba(167,139,250,.16); border:1px solid rgba(167,139,250,.3); }
+.pill.unknown { color:var(--muted); background:rgba(255,255,255,.08); }
+.duration { white-space:nowrap; color:var(--muted); }
+.message { color:#d8deea; max-width:460px; overflow-wrap:anywhere; }
+.empty { color:var(--muted); text-align:center; padding:32px; }
+footer { color:var(--muted); text-align:center; font-size:.8rem; margin-top:24px; }
+@media (max-width:760px) {
+  .wrap { padding:28px 14px 40px; }
+  header { flex-direction:column; }
+  .run-meta { text-align:left; }
+  .summary { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .card { padding:17px; }
+  .card-value { font-size:1.8rem; }
+  input { min-width:160px; width:100%; }
+}
+@media (max-width:420px) { .summary { grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Quality Engineering · Test Intelligence</div>
+      <h1>Test Run Dashboard</h1>
+      <p class="subtitle">TestCases<br>Custom Robot Framework report · Glass UI</p>
+    </div>
+    <div class="run-meta">
+      <div><strong>Generated</strong><br>2026-10-13 10:34:48 UTC</div>
+      <div><strong>Total duration</strong><br>—</div>
+    </div>
+  </header>
+
+  <section class="summary" aria-label="Test summary">
+    <article class="glass card">
+      <div class="card-label">Total tests</div><div class="card-value">77</div>
+      <div class="card-note">Tests discovered in output.xml</div>
+      <div class="progress-shell"><div class="progress"></div></div>
+    </article>
+    <article class="glass card">
+      <div class="card-label">Passed</div><div class="card-value pass-text">71</div>
+      <div class="card-note">92.2% pass rate</div>
+    </article>
+    <article class="glass card">
+      <div class="card-label">Failed</div><div class="card-value fail-text">6</div>
+      <div class="card-note">Tests requiring investigation</div>
+    </article>
+    <article class="glass card">
+      <div class="card-label">Skipped / other</div><div class="card-value skip-text">0</div>
+      <div class="card-note">0 skipped · 0 other</div>
+    </article>
+  </section>
+
+  <section class="glass panel">
+    <div class="panel-head">
+      <h2>Test case results</h2>
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search test or suite…" aria-label="Search tests">
+        <select id="sort" aria-label="Sort tests">
+          <option value="default">Original order</option>
+          <option value="name">Name A–Z</option>
+          <option value="duration">Duration: longest first</option>
+        </select>
+      </div>
+    </div>
+    <div class="tabs" role="group" aria-label="Filter test status">
+      <button class="tab active" data-filter="ALL">All (77)</button>
+      <button class="tab" data-filter="PASS">Passed (71)</button>
+      <button class="tab" data-filter="FAIL">Failed (6)</button>
+      <button class="tab" data-filter="SKIP">Skipped (0)</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Test case</th><th>Status</th><th>Duration</th><th>Status message</th></tr></thead>
+        <tbody id="testRows"><tr data-status="PASS"><td><span class="test-name">Verify Click On Register A New User Button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify First Name Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Last Name Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Address Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify City Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify State Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Zip Code Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Phone Number Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify SSN Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Username Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Password Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Confirm Password Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Register Button To Submit New User Data</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Loguot Button On Home Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Login User With Valid Credentials</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify To Click On Open New Account button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="FAIL"><td><span class="test-name">Verify To Click Account Type Dropdown</span><small>Test suite</small></td><td><span class="pill fail">FAIL</span></td><td class="duration">—</td><td class="message">Elements states &#x27;[&#x27;attached&#x27;, &#x27;defocused&#x27;, &#x27;enabled&#x27;, &#x27;hidden&#x27;, &#x27;selected&#x27;, &#x27;unchecked&#x27;]&#x27; (list) should contain &#x27;[&#x27;enabled&#x27;, &#x27;visible&#x27;]&#x27; (list)</td></tr>
+<tr data-status="FAIL"><td><span class="test-name">Verify To Click Select Checking From Account Type Dropdown</span><small>Test suite</small></td><td><span class="pill fail">FAIL</span></td><td class="duration">—</td><td class="message">TimeoutError: locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator(&#x27;//option[text()=\&#x27;CHECKING\&#x27;]&#x27;)
+    - locator resolved to &lt;option value=&quot;0&quot;&gt;CHECKING&lt;/option&gt;
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+      - waiting 100ms
+    19 × waiting for element to be visible, enabled and stable
+       - element is not visible
+     - retrying click action
+       - waiting 500ms</td></tr>
+<tr data-status="FAIL"><td><span class="test-name">Verify To Click Select Savings From Account Type Dropdown</span><small>Test suite</small></td><td><span class="pill fail">FAIL</span></td><td class="duration">—</td><td class="message">TimeoutError: locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator(&#x27;//option[text()=\&#x27;SAVINGS\&#x27;]&#x27;)
+    - locator resolved to &lt;option value=&quot;1&quot;&gt;SAVINGS&lt;/option&gt;
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+      - waiting 100ms
+    19 × waiting for element to be visible, enabled and stable
+       - element is not visible
+     - retrying click action
+       - waiting 500ms</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify To Click Existing Account dropdown</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify To Click Open New Account Button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Click On The Account Overview</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Click On Transfer Funds Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Amount Field On Transfer Funds Page Using $150 transfering</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="FAIL"><td><span class="test-name">Verify Click On Transfer Button</span><small>Test suite</small></td><td><span class="pill fail">FAIL</span></td><td class="duration">—</td><td class="message">Elements states &#x27;[&#x27;attached&#x27;, &#x27;defocused&#x27;, &#x27;enabled&#x27;, &#x27;hidden&#x27;]&#x27; (list) should contain &#x27;[&#x27;visible&#x27;]&#x27; (list)</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Amount Field On Transfer Funds Page Using $25.5 transfering</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Amount Field On Transfer Funds Page Using $8.99 transfering</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify That The Bill Pay Button Is Clickable In The Account Services Section</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Payee Name Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Address Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify City Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify State Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Zip Code Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Phone Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Account Number Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Verify Account Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Amount Field On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Send Payment Button On Bill Payment Service Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transactions button navigation Link</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transactions By Id Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find TransactionsById Button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transaction By Date input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find TransactionByDate Button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transaction By Date Range Start Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transaction By Date Range End Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find TransactionByDate Range Button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transaction By Amount Input Field</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Find Transaction By Amount Button</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Request Loan navigation button link</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Amount Input Field On Request Loan Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Down Payment Input Field On Request Loan Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Apply Now Button On Request Loan Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Login The Page</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Customers Details</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Customers Accounts</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Create A Account</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get New Account By Id</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Deposit Funds</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Withdraw Funds</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Transfer Funds</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get The List Of Transaction Account</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Transaction By Id</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Transaction By Amount</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Transaction By Month And Type Of Account</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="FAIL"><td><span class="test-name">Verify Get Request To Get Transaction By Date Range For Account</span><small>Test suite</small></td><td><span class="pill fail">FAIL</span></td><td class="duration">—</td><td class="message">No element matching &#x27;transaction[1]/id&#x27; found.</td></tr>
+<tr data-status="FAIL"><td><span class="test-name">Verify Get Request To Get Transaction By Specific Date</span><small>Test suite</small></td><td><span class="pill fail">FAIL</span></td><td class="duration">—</td><td class="message">No element matching &#x27;transaction[1]/id&#x27; found.</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Billpay</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Customers By Position</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Update Customer Details</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Buy A Share</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Customer Position By Position Id</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Get Request To Get Customer Positions By Costumer Id</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Sell A Share</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Clean DB</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To InitializeDB</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Stop JMS Listener</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr>
+<tr data-status="PASS"><td><span class="test-name">Verify Post Request To Start JMS Listener</span><small>Test suite</small></td><td><span class="pill pass">PASS</span></td><td class="duration">—</td><td class="message">Test passed</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+  <footer>Custom HTML reporter for Robot Framework · Accent color: #F48031</footer>
+</div>
+<script>
+(() => {
+  const tbody = document.getElementById('testRows');
+  const originalRows = Array.from(tbody.querySelectorAll('tr'));
+  let activeFilter = 'ALL';
+  const search = document.getElementById('search');
+  const sort = document.getElementById('sort');
+
+  function applyFilters() {
+    const term = search.value.trim().toLowerCase();
+    let rows = originalRows.slice();
+    if (sort.value === 'name') rows.sort((a,b) => a.cells[0].innerText.localeCompare(b.cells[0].innerText));
+    if (sort.value === 'duration') rows.sort((a,b) => durationValue(b.cells[2].innerText) - durationValue(a.cells[2].innerText));
+    rows.forEach(row => {
+      const status = row.dataset.status || '';
+      const matchesStatus = activeFilter === 'ALL' ||
+        status === activeFilter || (activeFilter === 'SKIP' && status === 'SKIPPED');
+      const matchesTerm = row.innerText.toLowerCase().includes(term);
+      row.hidden = !(matchesStatus && matchesTerm);
+      tbody.appendChild(row);
+    });
+  }
+  function durationValue(text) {
+    const s = text.trim();
+    if (s.endsWith('s')) return parseFloat(s) || 0;
+    const m = s.match(/(?:(\d+)h\s*)?(?:(\d+)m\s*)?(\d+(?:\.\d+)?)s?/);
+    return m ? (Number(m[1]||0)*3600 + Number(m[2]||0)*60 + Number(m[3]||0)) : 0;
+  }
+  document.querySelectorAll('.tab').forEach(button => button.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    button.classList.add('active');
+    activeFilter = button.dataset.filter;
+    applyFilters();
+  }));
+  search.addEventListener('input', applyFilters);
+  sort.addEventListener('change', applyFilters);
+})();
+</script>
+</body>
+</html>
