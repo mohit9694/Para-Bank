@@ -1,10 +1,12 @@
 # Para_Bank
 
+## Project_Structure
 robot-automation/
 ├── .devcontainer/
 ├── .github/
 │   └── workflows/
 │       └── robot-test.yml
+
 |── keywords
 |   |── loginpage.resource
 |   |── para_bank_keyword.resource
@@ -14,7 +16,7 @@ robot-automation/
 │   └── API/
 ├── Resources/
 ├── Python/
-├── results/
+├── results/custom_report.html
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt

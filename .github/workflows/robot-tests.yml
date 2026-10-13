@@ -48,3 +48,13 @@ jobs:
         with:
           name: robot-test-results
           path: results/
+        
+      - name: Generate custom HTML dashboard
+        if: always()
+        run: |
+          if [ -f results/output.xml ]; then
+            python Python/generate_report.py results/output.xml \
+              --output results/custom_report.html
+          else
+            echo "Robot output.xml not found"
+          fi    

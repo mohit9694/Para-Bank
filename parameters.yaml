@@ -2,8 +2,8 @@ fields:
   ui:
     browser: chromium
     url: https://parabank.parasoft.com/parabank/
-    username: mohittKCL
-    password: 123123KCL
+    username: mohittTJY
+    password: 123123TJY
   api:
     browser: firefox
     url: https://parabank.parasoft.com/parabank/services/bank
