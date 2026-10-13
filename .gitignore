@@ -1,6 +1,7 @@
 # Robot Framework results
 report.html
 results/browser/screenshot
+browser/screenshot
 *.xml
 
 # Python
